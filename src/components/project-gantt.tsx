@@ -197,7 +197,7 @@ export function ProjectGantt({
         onDeleteTask={deleteTaskById}
       />
     ),
-    [statusByTaskId, isGroupByTaskId, highlightTaskId, canWrite, onEditTask, tasks],
+    [statusByTaskId, isGroupByTaskId, highlightTaskId, canWrite, onEditTask, tasks, deleteTaskById],
   );
 
   function handleGanttKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {

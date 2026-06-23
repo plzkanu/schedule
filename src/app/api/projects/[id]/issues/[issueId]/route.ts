@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import {
-  requireApiSession,
   requireApiWriter,
 } from "@/lib/api-auth";
 import { isSupabaseConfigured } from "@/lib/supabase/config";

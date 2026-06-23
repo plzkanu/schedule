@@ -3,9 +3,6 @@ import {
   REVIEW_PRIORITIES,
   REVIEW_STATUSES,
   type ReviewInput,
-  type ReviewCategory,
-  type ReviewPriority,
-  type ReviewStatus,
 } from "./review-types";
 
 export function validateReviewInput(input: ReviewInput): string | null {
