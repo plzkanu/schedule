@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
 import { ROLE_LABELS } from "@/lib/role-labels";
+import { canManageUsers } from "@/lib/auth";
 import type { SessionUser } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -64,7 +65,7 @@ export function AppSidebar({ session }: AppSidebarProps) {
             </Link>
           );
         })}
-        {session.role === "admin" ? (
+        {canManageUsers(session) ? (
           <Link
             href="/admin/users"
             className={cn(

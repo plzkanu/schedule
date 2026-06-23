@@ -4,13 +4,14 @@ import { AppShell } from "@/components/app-shell";
 import { DashboardView, type DashboardTab } from "@/components/dashboard-view";
 import { SupabaseConfigAlert } from "@/components/supabase-config-alert";
 import { listRecentActivityLogs } from "@/lib/activity-logs";
-import { canWrite, getSessionUser, isAdmin } from "@/lib/auth";
+import { canManageUsers, canWrite, getSessionUser } from "@/lib/auth";
 import { buildDashboardData } from "@/lib/dashboard";
 import { listProjects } from "@/lib/projects";
 import { buildTechDashboardData } from "@/lib/tech-dashboard";
 import { listTechCapabilities } from "@/lib/tech-capabilities";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { getAllUsers } from "@/lib/users-store";
+import { buildUserDisplayMap } from "@/lib/user-display";
 
 interface DashboardPageProps {
   searchParams: Record<string, string | string[] | undefined>;
@@ -52,7 +53,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
 
   const users = await getAllUsers();
   const userNames = Object.fromEntries(users.map((user) => [user.id, user.name]));
-  const ownerNames = userNames;
+  const ownerNames = buildUserDisplayMap(users);
   const projectNames = Object.fromEntries(
     projects.map((project) => [project.id, project.name]),
   );
@@ -68,7 +69,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           defaultTab={defaultTab}
           userName={session.name}
           canWrite={canWrite(session)}
-          showAdminLink={isAdmin(session)}
+          showAdminLink={canManageUsers(session)}
           projectData={dashboard}
           techData={techDashboard}
           ownerNames={ownerNames}

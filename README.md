@@ -90,7 +90,7 @@ Supabase 미설정 시 `SupabaseConfigAlert` 컴포넌트로 안내합니다.
 
 ## 사용자 관리 (admin)
 
-`/admin/users` — admin 계정만 접근 가능합니다. 사용자 **등록·수정**(아이디, 이름, 이메일, 비밀번호, 역할, 부서)이 가능하며 Supabase `it_users` 테이블에 저장됩니다.
+`/admin/users` — **관리자 역할**(`admin`) 계정만 접근 가능합니다. (`admin` 아이디 계정에 한정되지 않음, 예: `hskim`) 사용자 **등록·수정**(아이디, 이름, 이메일, 비밀번호, 역할, 부서)이 가능하며 Supabase `it_users` 테이블에 저장됩니다.
 
 - API: `GET /api/admin/users`, `POST /api/admin/users`, `PATCH /api/admin/users/[id]`, `DELETE /api/admin/users/[id]`
 - 관리자가 한 명뿐일 때 역할 변경·삭제 불가

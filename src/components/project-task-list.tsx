@@ -9,6 +9,7 @@ import { deleteTaskWithConfirm } from "@/lib/task-delete-client";
 import { getChildCount, getTaskDepth, isGroupTask, sortTasksHierarchically } from "@/lib/task-hierarchy";
 import type { TaskWithDependencies } from "@/lib/task-types";
 import type { UserPublic } from "@/lib/types";
+import { buildUserDisplayMap } from "@/lib/user-display";
 import { cn } from "@/lib/utils";
 
 interface ProjectTaskListProps {
@@ -44,9 +45,7 @@ export function ProjectTaskList({
   const [deletingTaskId, setDeletingTaskId] = useState<string>();
   const [error, setError] = useState("");
 
-  const assigneeMap = Object.fromEntries(
-    assignees.map((user) => [user.id, user.name]),
-  );
+  const assigneeMap = buildUserDisplayMap(assignees);
 
   useEffect(() => {
     if (!contextMenu) {
@@ -163,7 +162,7 @@ export function ProjectTaskList({
                   {formatDateLabel(task.start_date)} ~{" "}
                   {formatDateLabel(task.end_date)}
                   {task.assignee_id
-                    ? ` · ${assigneeMap[task.assignee_id] ?? task.assignee_id}`
+                    ? ` · ${assigneeMap[task.assignee_id] ?? "담당자 미지정"}`
                     : ""}
                   {childCount > 0 ? ` · 하위 ${childCount}개` : ""}
                 </p>

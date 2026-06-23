@@ -76,7 +76,7 @@ export function DashboardApproachingList({
                       <p className="mt-1.5 text-xs text-slate-500">
                         마감 {formatDateLabel(project.end_date)} ·{" "}
                         {project.owner_id
-                          ? (ownerNames[project.owner_id] ?? project.owner_id)
+                          ? (ownerNames[project.owner_id] ?? "담당자 미지정")
                           : "담당자 미지정"}
                       </p>
                       <ProgressBar

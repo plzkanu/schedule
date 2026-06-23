@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { canWrite, getSessionUser, isAdmin } from "./auth";
+import { canManageUsers, canWrite, getSessionUser } from "./auth";
 import type { SessionUser } from "./types";
 
 export async function getApiSession(): Promise<SessionUser | null> {
@@ -31,8 +31,8 @@ export async function requireApiAdmin(): Promise<
   if (!session) {
     return unauthorizedResponse();
   }
-  if (!isAdmin(session)) {
-    return forbiddenResponse("관리자만 접근할 수 있습니다.");
+  if (!canManageUsers(session)) {
+    return forbiddenResponse("관리자 역할만 접근할 수 있습니다.");
   }
   return session;
 }

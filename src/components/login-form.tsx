@@ -79,7 +79,7 @@ export function LoginForm() {
               autoComplete="username"
               value={userId}
               onChange={(event) => setUserId(event.target.value)}
-              placeholder="hskim"
+              placeholder="아이디를 입력하세요"
               className="h-11"
             />
           </div>

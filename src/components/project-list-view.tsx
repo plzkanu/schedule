@@ -153,7 +153,7 @@ export function ProjectListView({ projects, ownerMap }: ProjectListViewProps) {
               project={project}
               ownerName={
                 project.owner_id
-                  ? (ownerMap[project.owner_id] ?? project.owner_id)
+                  ? (ownerMap[project.owner_id] ?? "담당자 미지정")
                   : "미지정"
               }
             />
@@ -206,7 +206,7 @@ export function ProjectListView({ projects, ownerMap }: ProjectListViewProps) {
                   </TableCell>
                   <TableCell className="text-sm">
                     {project.owner_id
-                      ? (ownerMap[project.owner_id] ?? project.owner_id)
+                      ? (ownerMap[project.owner_id] ?? "담당자 미지정")
                       : "-"}
                   </TableCell>
                 </TableRow>

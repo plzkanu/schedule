@@ -30,6 +30,7 @@ import {
 import type { TaskInput, TaskWithDependencies } from "@/lib/task-types";
 import { PROJECT_STATUSES, type ProjectStatus } from "@/lib/project-types";
 import type { UserPublic } from "@/lib/types";
+import { formatUserDisplayLabel } from "@/lib/user-display";
 
 interface TaskFormDialogProps {
   open: boolean;
@@ -369,7 +370,7 @@ export function TaskFormDialog({
                   <SelectItem value="none">미지정</SelectItem>
                   {assignees.map((user) => (
                     <SelectItem key={user.id} value={user.id}>
-                      {user.name}
+                      {formatUserDisplayLabel(user.name, user.department)}
                     </SelectItem>
                   ))}
                 </SelectContent>

@@ -104,13 +104,13 @@ export function ProjectIssueList({
                   <p className="mt-1">
                     등록{" "}
                     {issue.reporter_id
-                      ? (userNames[issue.reporter_id] ?? issue.reporter_id)
+                      ? (userNames[issue.reporter_id] ?? "미지정")
                       : "미지정"}
                   </p>
                   <p>
                     담당{" "}
                     {issue.assignee_id
-                      ? (userNames[issue.assignee_id] ?? issue.assignee_id)
+                      ? (userNames[issue.assignee_id] ?? "미지정")
                       : "미지정"}
                   </p>
                 </div>

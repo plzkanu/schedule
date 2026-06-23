@@ -10,6 +10,7 @@ import { listProjectTasks } from "@/lib/tasks";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { getAllUsers } from "@/lib/users-store";
 import { toPublicUser } from "@/lib/types";
+import { buildUserDisplayMap } from "@/lib/user-display";
 
 interface ProjectDetailPageProps {
   params: { id: string };
@@ -53,9 +54,9 @@ export default async function ProjectDetailPage({
   const assignees = users
     .filter((user) => user.role === "admin" || user.role === "member")
     .map(toPublicUser);
-  const userNames = Object.fromEntries(users.map((user) => [user.id, user.name]));
+  const userNames = buildUserDisplayMap(users);
   const ownerName = project.owner_id
-    ? (userNames[project.owner_id] ?? project.owner_id)
+    ? (userNames[project.owner_id] ?? "-")
     : "-";
 
   const [{ data: tasks }, { data: issues }, { data: logs }] = await Promise.all([

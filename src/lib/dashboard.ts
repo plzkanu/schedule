@@ -120,7 +120,7 @@ export function buildDashboardData(
   const ownerCounts = new Map<string, number>();
   for (const project of projects) {
     const name = project.owner_id
-      ? (ownerNames[project.owner_id] ?? project.owner_id)
+      ? (ownerNames[project.owner_id] ?? "담당자 미지정")
       : "미지정";
     ownerCounts.set(name, (ownerCounts.get(name) ?? 0) + 1);
   }

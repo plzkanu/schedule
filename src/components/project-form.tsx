@@ -23,6 +23,7 @@ import {
   type ProjectStatus,
 } from "@/lib/project-types";
 import type { UserPublic } from "@/lib/types";
+import { formatUserDisplayLabel } from "@/lib/user-display";
 
 interface ProjectFormProps {
   mode: "create" | "edit";
@@ -283,7 +284,7 @@ export function ProjectForm({ mode, project, assignees }: ProjectFormProps) {
                   <SelectItem value="none">미지정</SelectItem>
                   {assignees.map((user) => (
                     <SelectItem key={user.id} value={user.id}>
-                      {user.name} ({user.department})
+                      {formatUserDisplayLabel(user.name, user.department)}
                     </SelectItem>
                   ))}
                 </SelectContent>

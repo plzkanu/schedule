@@ -3,7 +3,7 @@ import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/page-header";
 import { SupabaseConfigAlert } from "@/components/supabase-config-alert";
 import { UserManagementPanel } from "@/components/user-management-panel";
-import { getSessionUser, isAdmin } from "@/lib/auth";
+import { canManageUsers, getSessionUser } from "@/lib/auth";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { toPublicUser, type User } from "@/lib/types";
 import { getAllUsers } from "@/lib/users-store";
@@ -14,7 +14,7 @@ export default async function AdminUsersPage() {
     redirect("/login");
   }
 
-  if (!isAdmin(session)) {
+  if (!canManageUsers(session)) {
     redirect("/dashboard");
   }
 
@@ -50,7 +50,7 @@ export default async function AdminUsersPage() {
       <div className="space-y-8">
         <PageHeader
           title="사용자 관리"
-          description="시스템 사용자를 등록·수정합니다. admin 계정만 접근할 수 있습니다."
+          description="시스템 사용자를 등록·수정합니다. 관리자 역할(admin) 계정만 접근할 수 있습니다."
         />
 
         {loadError ? (

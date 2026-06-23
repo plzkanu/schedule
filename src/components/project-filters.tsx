@@ -18,6 +18,7 @@ import {
   PROJECT_STATUSES,
 } from "@/lib/project-types";
 import type { UserPublic } from "@/lib/types";
+import { formatUserDisplayLabel } from "@/lib/user-display";
 
 interface ProjectFiltersProps {
   assignees: UserPublic[];
@@ -187,7 +188,7 @@ export function ProjectFilters({ assignees }: ProjectFiltersProps) {
                 <SelectItem value="all">전체</SelectItem>
                 {assignees.map((user) => (
                   <SelectItem key={user.id} value={user.id}>
-                    {user.name}
+                    {formatUserDisplayLabel(user.name, user.department)}
                   </SelectItem>
                 ))}
               </SelectContent>
