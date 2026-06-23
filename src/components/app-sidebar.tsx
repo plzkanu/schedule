@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
 import { ROLE_LABELS } from "@/lib/role-labels";
-import { canManageUsers } from "@/lib/auth";
+import { canManageUsers } from "@/lib/auth-permissions";
 import type { SessionUser } from "@/lib/types";
 import { cn } from "@/lib/utils";
 

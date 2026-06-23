@@ -1,6 +1,6 @@
 import { AppMobileHeader } from "@/components/app-mobile-header";
 import { AppSidebar } from "@/components/app-sidebar";
-import { canManageUsers } from "@/lib/auth";
+import { canManageUsers } from "@/lib/auth-permissions";
 import type { SessionUser } from "@/lib/types";
 
 interface AppShellProps {

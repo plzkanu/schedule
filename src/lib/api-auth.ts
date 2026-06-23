@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { canManageUsers, canWrite, getSessionUser } from "./auth";
+import { canManageUsers, canWrite } from "./auth-permissions";
+import { getSessionUser } from "./auth";
 import type { SessionUser } from "./types";
 
 export async function getApiSession(): Promise<SessionUser | null> {
