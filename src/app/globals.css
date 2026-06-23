@@ -1,27 +1,130 @@
+@import "tw-animate-css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-}
-
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+}
+
+@layer base {
+  :root {
+    --background: #f0f4f8;
+    --foreground: #0f172a;
+    --card: #ffffff;
+    --card-foreground: #0f172a;
+    --popover: #ffffff;
+    --popover-foreground: #0f172a;
+    --primary: #004b87;
+    --primary-foreground: #ffffff;
+    --secondary: #e8f0f8;
+    --secondary-foreground: #004b87;
+    --muted: #f1f5f9;
+    --muted-foreground: #64748b;
+    --accent: #e6f4fb;
+    --accent-foreground: #004b87;
+    --destructive: #dc2626;
+    --destructive-foreground: #ffffff;
+    --border: #e2e8f0;
+    --input: #e2e8f0;
+    --ring: #009ada;
+    --radius: 0.75rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  }
+}
+
+@layer components {
+  .surface-card {
+    @apply rounded-xl border border-slate-200/80 bg-white shadow-card;
+  }
+
+  /* Gantt chart brand styling */
+  .gantt-wrapper {
+    --gantt-grid: #f1f5f9;
+    --gantt-header-bg: #f8fafc;
+    --gantt-header-text: #475569;
+    --gantt-today: rgba(0, 154, 218, 0.12);
+  }
+
+  .gantt-wrapper .gantt-table,
+  .gantt-wrapper ._3T4L {
+    font-family: inherit;
+    font-size: 13px;
+  }
+
+  .gantt-wrapper svg text {
+    fill: var(--gantt-header-text);
+    font-size: 12px;
+  }
+
+  .gantt-wrapper ._3lLk3,
+  .gantt-wrapper ._3zRJQ {
+    fill: #004b87;
+    font-weight: 600;
+  }
+
+  .gantt-wrapper ._1nBOt {
+    stroke: var(--gantt-grid);
+    stroke-width: 1;
+  }
+
+  .gantt-wrapper ._2dZTy {
+    fill: #ffffff;
+  }
+
+  .gantt-wrapper ._2dZTy:nth-child(even) {
+    fill: #ffffff;
+  }
+
+  .gantt-wrapper ._2q1Kt,
+  .gantt-wrapper ._9w8d5 {
+    fill: #64748b;
+    font-size: 11px;
+  }
+
+  .gantt-wrapper ._35nLX {
+    fill: var(--gantt-header-bg);
+  }
+
+  .gantt-wrapper ._31ERP {
+    stroke: #e2e8f0;
+  }
+
+  .gantt-wrapper ._3rUKi {
+    stroke: rgba(0, 75, 135, 0.35);
+    stroke-width: 1.5;
+  }
+
+  .gantt-wrapper ._RRr13 {
+    cursor: grab;
+  }
+
+  .gantt-wrapper ._RRr13:hover {
+    filter: brightness(1.03);
+  }
+
+  .gantt-tooltip {
+    animation: gantt-tooltip-in 0.15s ease-out;
+  }
+
+  @keyframes gantt-tooltip-in {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 }

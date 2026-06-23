@@ -1,0 +1,36 @@
+{
+  "users": [
+    {
+      "id": "admin",
+      "name": "시스템 관리자",
+      "email": "admin@soosan.com",
+      "passwordHash": "$2b$10$m6fqr16mquxvwCMKbwAaJOT.aqijUPO6YikbQNpn8U0tV2zLE6OY.",
+      "role": "admin",
+      "department": "IT팀"
+    },
+    {
+      "id": "hskim",
+      "name": "김형성",
+      "email": "hskim@soosan.com",
+      "passwordHash": "$2b$10$tr9XIbIhTIhPtMdp5FtN7.41AYMirAn69GliycqjGDY8ASBWPYknW",
+      "role": "admin",
+      "department": "IT팀"
+    },
+    {
+      "id": "member1",
+      "name": "김개발",
+      "email": "member@soosan.com",
+      "passwordHash": "$2b$10$pHNfB9KK/bnSpV/oCRIB7OrAF6/Mt/ehdY9d1AyierGD8EKX5Hrli",
+      "role": "member",
+      "department": "IT팀"
+    },
+    {
+      "id": "viewer1",
+      "name": "이경영",
+      "email": "viewer@soosan.com",
+      "passwordHash": "$2b$10$5LrGsMTdrVdtKCURmRlzvexmdCZD5IIYHqhj6.v75xSz65ZDbTCua",
+      "role": "viewer",
+      "department": "경영진"
+    }
+  ]
+}
