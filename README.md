@@ -68,20 +68,6 @@ NOTIFY pgrst, 'reload schema';
 
 또는 `supabase/migrations/007_it_tables_disable_rls.sql` 파일 내용을 실행합니다.
 
-## 인증
-
-Supabase Auth는 사용하지 않습니다. **Supabase `it_users` 테이블**에 사용자를 저장하고, bcrypt + AUTH_SECRET 세션 쿠키로 로그인합니다.
-
-| 역할 | 아이디 | 비밀번호 | 권한 |
-|------|--------|----------|------|
-| admin | admin | admin123 | 전체 + 사용자 관리 |
-| admin | hskim | (입찰 시스템과 동일) | admin · IT팀 |
-| member | member1 | member123 | 프로젝트/태스크 CRUD |
-| viewer | viewer1 | viewer123 | 조회 전용 |
-
-아이디 또는 이메일(`hskim@soosan.com` 등) 모두 로그인에 사용할 수 있습니다.
-
-`middleware.ts`에서 `/dashboard`, `/projects`, `/admin` 경로를 보호합니다.
 
 ## 개발 서버
 
