@@ -7,6 +7,7 @@ const PROTECTED_PREFIXES = [
   "/reviews",
   "/projects",
   "/tech-capabilities",
+  "/weekly-work",
   "/admin",
 ];
 
@@ -20,7 +21,8 @@ function isViewerWritePath(pathname: string) {
   if (
     pathname === "/projects/new" ||
     pathname === "/tech-capabilities/new" ||
-    pathname === "/reviews/new"
+    pathname === "/reviews/new" ||
+    pathname === "/weekly-work/new"
   ) {
     return true;
   }
@@ -30,7 +32,10 @@ function isViewerWritePath(pathname: string) {
   if (/^\/tech-capabilities\/[^/]+\/edit$/.test(pathname)) {
     return true;
   }
-  return /^\/reviews\/[^/]+\/edit$/.test(pathname);
+  if (/^\/reviews\/[^/]+\/edit$/.test(pathname)) {
+    return true;
+  }
+  return /^\/weekly-work\/[^/]+\/edit$/.test(pathname);
 }
 
 export async function middleware(request: NextRequest) {
@@ -65,6 +70,7 @@ export const config = {
     "/reviews/:path*",
     "/projects/:path*",
     "/tech-capabilities/:path*",
+    "/weekly-work/:path*",
     "/admin/:path*",
     "/login",
   ],

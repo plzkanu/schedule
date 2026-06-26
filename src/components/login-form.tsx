@@ -47,6 +47,9 @@ export function LoginForm() {
         from &&
         (from.startsWith("/dashboard") ||
           from.startsWith("/projects") ||
+          from.startsWith("/reviews") ||
+          from.startsWith("/tech-capabilities") ||
+          from.startsWith("/weekly-work") ||
           from.startsWith("/admin"))
           ? from
           : "/dashboard";

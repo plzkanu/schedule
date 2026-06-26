@@ -217,4 +217,106 @@ CREATE INDEX IF NOT EXISTS idx_it_reviews_project_id ON it_reviews (project_id);
 
 ALTER TABLE it_reviews DISABLE ROW LEVEL SECURITY;
 
+-- 014 it_weekly_work (IT팀 주간업무)
+CREATE TABLE IF NOT EXISTS it_weekly_work (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id text NOT NULL,
+  week_start date NOT NULL,
+  work_type text NOT NULL CHECK (work_type IN ('project', 'misc')),
+  project_name text,
+  content text,
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now(),
+  CONSTRAINT it_weekly_work_type_fields CHECK (
+    (
+      work_type = 'project'
+      AND project_name IS NOT NULL
+      AND btrim(project_name) <> ''
+    )
+    OR (
+      work_type = 'misc'
+      AND content IS NOT NULL
+      AND btrim(content) <> ''
+    )
+  )
+);
+
+CREATE INDEX IF NOT EXISTS idx_it_weekly_work_user_id ON it_weekly_work (user_id);
+CREATE INDEX IF NOT EXISTS idx_it_weekly_work_week_start ON it_weekly_work (week_start DESC);
+CREATE INDEX IF NOT EXISTS idx_it_weekly_work_work_type ON it_weekly_work (work_type);
+
+ALTER TABLE it_weekly_work DISABLE ROW LEVEL SECURITY;
+
+-- 015 it_weekly_work_comments (관리자 코멘트·읽음 추적)
+CREATE TABLE IF NOT EXISTS it_weekly_work_comments (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  weekly_work_id uuid NOT NULL REFERENCES it_weekly_work (id) ON DELETE CASCADE,
+  author_id text NOT NULL,
+  content text NOT NULL,
+  created_at timestamptz DEFAULT now(),
+  CONSTRAINT it_weekly_work_comments_content_not_empty CHECK (btrim(content) <> '')
+);
+
+CREATE INDEX IF NOT EXISTS idx_it_weekly_work_comments_work_id
+  ON it_weekly_work_comments (weekly_work_id, created_at);
+
+CREATE TABLE IF NOT EXISTS it_weekly_work_reads (
+  weekly_work_id uuid NOT NULL REFERENCES it_weekly_work (id) ON DELETE CASCADE,
+  user_id text NOT NULL,
+  read_at timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY (weekly_work_id, user_id)
+);
+
+ALTER TABLE it_weekly_work_comments DISABLE ROW LEVEL SECURITY;
+ALTER TABLE it_weekly_work_reads DISABLE ROW LEVEL SECURITY;
+
+-- 016 it_weekly_work daily_entries (요일별 업무 내용)
+ALTER TABLE it_weekly_work
+  ADD COLUMN IF NOT EXISTS daily_entries jsonb NOT NULL DEFAULT '{}'::jsonb;
+
+ALTER TABLE it_weekly_work DROP CONSTRAINT IF EXISTS it_weekly_work_type_fields;
+
+ALTER TABLE it_weekly_work ADD CONSTRAINT it_weekly_work_type_fields CHECK (
+  (
+    work_type = 'project'
+    AND project_name IS NOT NULL
+    AND btrim(project_name) <> ''
+  )
+  OR (
+    work_type = 'misc'
+    AND (
+      (content IS NOT NULL AND btrim(content) <> '')
+      OR (
+        daily_entries IS NOT NULL
+        AND daily_entries <> '{}'::jsonb
+      )
+    )
+  )
+);
+
+-- 017 it_weekly_work_comments status (담당자 응답 상태)
+ALTER TABLE it_weekly_work_comments
+  ADD COLUMN IF NOT EXISTS status text CHECK (
+    status IS NULL
+    OR status IN ('review', 'in_progress', 'completed', 'rejected')
+  );
+
+ALTER TABLE it_weekly_work_comments
+  DROP CONSTRAINT IF EXISTS it_weekly_work_comments_content_not_empty;
+
+ALTER TABLE it_weekly_work_comments
+  ADD CONSTRAINT it_weekly_work_comments_content_not_empty CHECK (
+    btrim(content) <> ''
+    OR status IS NOT NULL
+  );
+
+-- 018 it_weekly_work_comments parent_id (답글 스레드)
+ALTER TABLE it_weekly_work_comments
+  ADD COLUMN IF NOT EXISTS parent_id uuid REFERENCES it_weekly_work_comments (id) ON DELETE CASCADE;
+
+CREATE INDEX IF NOT EXISTS idx_it_weekly_work_comments_parent_id
+  ON it_weekly_work_comments (parent_id);
+
+-- 019 daily_entries plan/actual/overtime (JSON 구조 문서화, 스키마 변경 없음)
+
 NOTIFY pgrst, 'reload schema';

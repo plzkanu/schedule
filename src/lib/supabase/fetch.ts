@@ -34,6 +34,62 @@ export function formatSupabaseNetworkError(message: string): string {
     );
   }
   if (
+    (normalized.includes("it_weekly_work_comments") ||
+      normalized.includes("it_weekly_work_reads")) &&
+    (normalized.includes("schema cache") ||
+      normalized.includes("relation") ||
+      normalized.includes("does not exist"))
+  ) {
+    return (
+      "주간업무 코멘트 테이블이 없습니다. Supabase SQL Editor에서 " +
+      "supabase/migrations/015_it_weekly_work_comments.sql 파일 내용을 실행해 주세요."
+    );
+  }
+  if (
+    normalized.includes("parent_id") &&
+    normalized.includes("it_weekly_work_comments") &&
+    (normalized.includes("schema cache") ||
+      normalized.includes("column") ||
+      normalized.includes("does not exist"))
+  ) {
+    return (
+      "주간업무 코멘트 답글 컬럼이 없습니다. Supabase SQL Editor에서 " +
+      "supabase/migrations/018_it_weekly_work_comment_threads.sql 파일 내용을 실행해 주세요."
+    );
+  }
+  if (
+    normalized.includes("it_weekly_work_comments") &&
+    (normalized.includes("schema cache") ||
+      normalized.includes("column") ||
+      normalized.includes("does not exist"))
+  ) {
+    return (
+      "주간업무 코멘트 상태 컬럼이 없습니다. Supabase SQL Editor에서 " +
+      "supabase/migrations/017_it_weekly_work_comment_status.sql 파일 내용을 실행해 주세요."
+    );
+  }
+  if (
+    (normalized.includes("schema cache") ||
+      normalized.includes("column") ||
+      normalized.includes("does not exist"))
+  ) {
+    return (
+      "주간업무 요일별 컬럼이 없습니다. Supabase SQL Editor에서 " +
+      "supabase/migrations/016_it_weekly_work_daily_entries.sql 파일 내용을 실행해 주세요."
+    );
+  }
+  if (
+    normalized.includes("it_weekly_work") &&
+    (normalized.includes("schema cache") ||
+      normalized.includes("relation") ||
+      normalized.includes("does not exist"))
+  ) {
+    return (
+      "it_weekly_work 테이블이 없습니다. Supabase SQL Editor에서 " +
+      "supabase/migrations/014_it_weekly_work.sql 파일 내용을 실행해 주세요."
+    );
+  }
+  if (
     normalized.includes("it_reviews") &&
     (normalized.includes("schema cache") ||
       normalized.includes("relation") ||
