@@ -6,6 +6,7 @@ import { PageHeader } from "@/components/page-header";
 import { SupabaseConfigAlert } from "@/components/supabase-config-alert";
 import { WeeklyWorkFilters } from "@/components/weekly-work-filters";
 import { WeeklyWorkListView } from "@/components/weekly-work-list-view";
+import { UserScheduleCalendar } from "@/components/user-schedule-calendar";
 import { buttonVariants } from "@/components/ui/button";
 import { canWrite, getSessionUser, isAdmin } from "@/lib/auth";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
@@ -88,7 +89,7 @@ export default async function WeeklyWorkPage({
       <div className="space-y-6">
         <PageHeader
           title="주간업무"
-          description="IT팀 주간업무를 프로젝트와 잡무로 구분해 등록·조회합니다."
+          description="IT팀 주간업무와 외근·휴가 일정을 등록·조회합니다."
           action={
             canWrite(session) ? (
               <Link
@@ -107,6 +108,15 @@ export default async function WeeklyWorkPage({
           <SupabaseConfigAlert />
         ) : (
           <>
+            <UserScheduleCalendar
+              canWrite={canWrite(session)}
+              showUserFilter
+              assignees={assignees}
+              defaultUserId={session.id}
+              currentUserId={session.id}
+              title="외근 · 휴가 일정"
+            />
+
             <Suspense fallback={<div className="h-24 rounded-xl bg-white" />}>
               <WeeklyWorkFilters
                 showUserFilter={admin}

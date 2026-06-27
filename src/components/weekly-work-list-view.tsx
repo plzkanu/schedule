@@ -14,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatUserDisplayLabel } from "@/lib/user-display";
+import { buildUserDisplayMap, resolveUserDisplayLabel } from "@/lib/user-display";
 import {
   getWeeklyWorkSummary,
   formatWeekRangeLabel,
@@ -48,12 +48,7 @@ export function WeeklyWorkListView({
   const [error, setError] = useState("");
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  const userMap = Object.fromEntries(
-    assignees.map((user) => [
-      user.id,
-      formatUserDisplayLabel(user.name, user.department),
-    ]),
-  );
+  const userMap = buildUserDisplayMap(assignees);
 
   function canModifyItem(item: WeeklyWork) {
     if (!canWrite) return false;
@@ -174,7 +169,7 @@ export function WeeklyWorkListView({
                   </TableCell>
                   {showAuthor ? (
                     <TableCell className="text-sm text-slate-700">
-                      {userMap[item.user_id] ?? item.user_id}
+                      {resolveUserDisplayLabel(userMap, item.user_id)}
                     </TableCell>
                   ) : null}
                   <TableCell>

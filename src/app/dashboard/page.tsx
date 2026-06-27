@@ -3,15 +3,16 @@ import { redirect } from "next/navigation";
 import { AppShell } from "@/components/app-shell";
 import { DashboardView, type DashboardTab } from "@/components/dashboard-view";
 import { SupabaseConfigAlert } from "@/components/supabase-config-alert";
-import { listRecentActivityLogs } from "@/lib/activity-logs";
-import { canManageUsers, canWrite, getSessionUser } from "@/lib/auth";
+import { listActivityLogsPaginated } from "@/lib/activity-logs";
+import { canWrite, getSessionUser } from "@/lib/auth";
 import { buildDashboardData } from "@/lib/dashboard";
 import { listProjects } from "@/lib/projects";
 import { buildTechDashboardData } from "@/lib/tech-dashboard";
 import { listTechCapabilities } from "@/lib/tech-capabilities";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { getAllUsers } from "@/lib/users-store";
-import { buildUserDisplayMap } from "@/lib/user-display";
+import { buildUserDisplayMap, formatUserDisplayLabel } from "@/lib/user-display";
+import { toPublicUser } from "@/lib/types";
 
 interface DashboardPageProps {
   searchParams: Record<string, string | string[] | undefined>;
@@ -43,17 +44,20 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
 
   const [
     { data: projects, error: projectsError },
-    { data: logs, error: logsError },
+    { data: logs, total: activityTotal, error: logsError },
     { data: techItems, error: techError },
   ] = await Promise.all([
     listProjects(),
-    listRecentActivityLogs(8),
+    listActivityLogsPaginated(1, 5),
     listTechCapabilities(),
   ]);
 
   const users = await getAllUsers();
-  const userNames = Object.fromEntries(users.map((user) => [user.id, user.name]));
-  const ownerNames = buildUserDisplayMap(users);
+  const assignees = users
+    .filter((user) => user.role === "admin" || user.role === "member")
+    .map(toPublicUser);
+  const userNames = buildUserDisplayMap(users);
+  const ownerNames = userNames;
   const projectNames = Object.fromEntries(
     projects.map((project) => [project.id, project.name]),
   );
@@ -67,15 +71,17 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       <Suspense fallback={<div className="h-96 animate-pulse rounded-2xl bg-slate-100" />}>
         <DashboardView
           defaultTab={defaultTab}
-          userName={session.name}
+          userName={formatUserDisplayLabel(session.name, session.department)}
           canWrite={canWrite(session)}
-          showAdminLink={canManageUsers(session)}
+          currentUserId={session.id}
+          assignees={assignees}
           projectData={dashboard}
           techData={techDashboard}
           ownerNames={ownerNames}
           userNames={userNames}
           projectNames={projectNames}
           logs={logs}
+          activityTotal={activityTotal}
           projectsError={projectsError}
           logsError={logsError}
           techError={techError}

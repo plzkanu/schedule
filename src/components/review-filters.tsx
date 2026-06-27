@@ -19,6 +19,7 @@ import {
   REVIEW_STATUSES,
 } from "@/lib/review-types";
 import type { UserPublic } from "@/lib/types";
+import { formatUserDisplayLabel } from "@/lib/user-display";
 
 interface ReviewFiltersProps {
   assignees: UserPublic[];
@@ -137,7 +138,9 @@ export function ReviewFilters({ assignees }: ReviewFiltersProps) {
               <SelectContent>
                 <SelectItem value="all">전체</SelectItem>
                 {assignees.map((user) => (
-                  <SelectItem key={user.id} value={user.id}>{user.name}</SelectItem>
+                  <SelectItem key={user.id} value={user.id}>
+                    {formatUserDisplayLabel(user.name, user.department)}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>

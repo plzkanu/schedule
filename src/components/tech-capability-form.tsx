@@ -27,6 +27,7 @@ import {
 } from "@/lib/tech-capability-types";
 import type { ProjectStatus } from "@/lib/project-types";
 import type { UserPublic } from "@/lib/types";
+import { formatUserDisplayLabel } from "@/lib/user-display";
 
 interface TechCapabilityFormProps {
   mode: "create" | "edit";
@@ -255,7 +256,9 @@ export function TechCapabilityForm({
               <SelectContent>
                 <SelectItem value="none">미지정</SelectItem>
                 {assignees.map((u) => (
-                  <SelectItem key={u.id} value={u.id}>{u.name}</SelectItem>
+                  <SelectItem key={u.id} value={u.id}>
+                    {formatUserDisplayLabel(u.name, u.department)}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>

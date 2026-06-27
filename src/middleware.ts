@@ -4,6 +4,7 @@ import { parseSessionToken, SESSION_COOKIE } from "@/lib/session-token";
 
 const PROTECTED_PREFIXES = [
   "/dashboard",
+  "/activity",
   "/reviews",
   "/projects",
   "/tech-capabilities",
@@ -67,6 +68,7 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     "/dashboard/:path*",
+    "/activity/:path*",
     "/reviews/:path*",
     "/projects/:path*",
     "/tech-capabilities/:path*",

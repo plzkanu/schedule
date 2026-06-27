@@ -10,6 +10,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import type { ActivityLog } from "@/lib/activity-logs";
+import { resolveUserDisplayLabel } from "@/lib/user-display";
 
 interface ActivityTimelineProps {
   logs: ActivityLog[];
@@ -75,7 +76,7 @@ export function ActivityTimeline({ logs, userNames }: ActivityTimelineProps) {
                     </div>
                     <p className="mt-0.5 text-xs text-slate-500">
                       {log.user_id
-                        ? (userNames[log.user_id] ?? log.user_id)
+                        ? resolveUserDisplayLabel(userNames, log.user_id)
                         : "시스템"}
                     </p>
                     {log.content ? (

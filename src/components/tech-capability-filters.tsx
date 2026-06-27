@@ -20,6 +20,7 @@ import {
   TECH_PRIORITIES,
 } from "@/lib/tech-capability-types";
 import type { UserPublic } from "@/lib/types";
+import { formatUserDisplayLabel } from "@/lib/user-display";
 
 interface TechCapabilityFiltersProps {
   assignees: UserPublic[];
@@ -210,7 +211,9 @@ export function TechCapabilityFilters({ assignees }: TechCapabilityFiltersProps)
               <SelectContent>
                 <SelectItem value="all">전체</SelectItem>
                 {assignees.map((user) => (
-                  <SelectItem key={user.id} value={user.id}>{user.name}</SelectItem>
+                  <SelectItem key={user.id} value={user.id}>
+                    {formatUserDisplayLabel(user.name, user.department)}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>

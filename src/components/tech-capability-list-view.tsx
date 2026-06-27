@@ -1,5 +1,6 @@
 import type { TechCapability } from "@/lib/tech-capability-types";
 import { TechCapabilityCard } from "@/components/tech-capability-card";
+import { resolveUserDisplayLabel } from "@/lib/user-display";
 
 interface TechCapabilityListViewProps {
   items: TechCapability[];
@@ -29,11 +30,7 @@ export function TechCapabilityListView({
         <TechCapabilityCard
           key={item.id}
           item={item}
-          ownerName={
-            item.owner_id
-              ? (ownerNames[item.owner_id] ?? item.owner_id)
-              : "미지정"
-          }
+          ownerName={resolveUserDisplayLabel(ownerNames, item.owner_id, "미지정")}
         />
       ))}
     </div>

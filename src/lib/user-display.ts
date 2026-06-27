@@ -16,3 +16,14 @@ export function buildUserDisplayMap(
     ]),
   );
 }
+
+export function resolveUserDisplayLabel(
+  userMap: Record<string, string>,
+  userId: string | null | undefined,
+  fallback = "알 수 없음",
+): string {
+  if (!userId) {
+    return fallback;
+  }
+  return userMap[userId] ?? fallback;
+}

@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { formatUserDisplayLabel } from "@/lib/user-display";
+import { buildUserDisplayMap, resolveUserDisplayLabel } from "@/lib/user-display";
 import {
   WEEKLY_WORK_RESPONSE_STATUSES,
   WEEKLY_WORK_RESPONSE_STATUS_LABELS,
@@ -167,7 +167,7 @@ function CommentThreadItem({
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex flex-wrap items-center gap-2">
             <p className="text-sm font-medium text-slate-800">
-              {userMap[node.author_id] ?? node.author_id}
+              {resolveUserDisplayLabel(userMap, node.author_id)}
             </p>
             {isOwnerComment ? (
               <>
@@ -257,12 +257,7 @@ export function WeeklyWorkCommentsPanel({
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const userMap = Object.fromEntries(
-    assignees.map((user) => [
-      user.id,
-      formatUserDisplayLabel(user.name, user.department),
-    ]),
-  );
+  const userMap = buildUserDisplayMap(assignees);
 
   const filledDays = getFilledDailyEntries(item);
   const commentTree = buildCommentTree(comments);
@@ -366,7 +361,7 @@ export function WeeklyWorkCommentsPanel({
           {getWeeklyWorkSummary(item)}
         </h2>
         <p className="mt-1 text-sm text-slate-500">
-          작성자 {userMap[item.user_id] ?? item.user_id}
+          작성자 {resolveUserDisplayLabel(userMap, item.user_id)}
         </p>
       </div>
 

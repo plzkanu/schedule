@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/table";
 import { UserFormDialog } from "@/components/user-form-dialog";
 import { ROLE_LABELS } from "@/lib/role-labels";
+import { formatUserDisplayLabel } from "@/lib/user-display";
 import type { UserPublic } from "@/lib/types";
 
 interface UserManagementPanelProps {
@@ -65,7 +66,7 @@ export function UserManagementPanel({
     }
 
     const confirmed = window.confirm(
-      `"${user.name}" (${user.id}) 사용자를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`,
+      `"${formatUserDisplayLabel(user.name, user.department)}" 사용자를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`,
     );
     if (!confirmed) {
       return;

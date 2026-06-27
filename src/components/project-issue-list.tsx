@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { IssueStatusBadge } from "@/components/issue-status-badge";
 import { PriorityBadge } from "@/components/priority-badge";
 import type { ProjectIssue } from "@/lib/issue-types";
+import { resolveUserDisplayLabel } from "@/lib/user-display";
 import { cn } from "@/lib/utils";
 
 interface ProjectIssueListProps {
@@ -102,16 +103,10 @@ export function ProjectIssueList({
                 <div className="shrink-0 text-xs text-slate-500 sm:text-right">
                   <p>발생 {formatDateLabel(issue.occurred_date)}</p>
                   <p className="mt-1">
-                    등록{" "}
-                    {issue.reporter_id
-                      ? (userNames[issue.reporter_id] ?? "미지정")
-                      : "미지정"}
+                    등록 {resolveUserDisplayLabel(userNames, issue.reporter_id, "미지정")}
                   </p>
                   <p>
-                    담당{" "}
-                    {issue.assignee_id
-                      ? (userNames[issue.assignee_id] ?? "미지정")
-                      : "미지정"}
+                    담당 {resolveUserDisplayLabel(userNames, issue.assignee_id, "미지정")}
                   </p>
                 </div>
               </div>

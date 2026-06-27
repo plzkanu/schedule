@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, FolderKanban, Plus, Settings } from "lucide-react";
+import { ArrowRight, FolderKanban, Plus } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -10,7 +10,6 @@ interface DashboardHeroProps {
   delayedProjects: number;
   completionRate: number;
   canWrite: boolean;
-  showAdminLink?: boolean;
 }
 
 export function DashboardHero({
@@ -20,7 +19,6 @@ export function DashboardHero({
   delayedProjects,
   completionRate,
   canWrite,
-  showAdminLink = false,
 }: DashboardHeroProps) {
   const today = new Intl.DateTimeFormat("ko-KR", {
     dateStyle: "full",
@@ -32,13 +30,13 @@ export function DashboardHero({
         aria-hidden
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,_#009ada55,_transparent_50%),radial-gradient(circle_at_bottom_left,_#ffffff08,_transparent_40%)]"
       />
-      <div className="relative flex flex-col gap-6 p-6 sm:p-8 lg:flex-row lg:items-end lg:justify-between">
-        <div className="max-w-2xl">
+      <div className="relative flex flex-col gap-4 p-6 sm:p-8 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
+        <div className="min-w-0 flex-1">
           <p className="text-sm font-medium text-white/65">{today}</p>
           <h1 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">
             안녕하세요, {userName}님
           </h1>
-          <p className="mt-3 text-sm leading-relaxed text-white/75">
+          <p className="mt-3 text-sm text-white/75 sm:whitespace-nowrap">
             전체 {totalProjects}개 프로젝트 · 진행중 {inProgressProjects}개 ·
             완료율 {completionRate}%
             {delayedProjects > 0
@@ -47,7 +45,7 @@ export function DashboardHero({
           </p>
         </div>
 
-        <div className="flex flex-wrap gap-2">
+        <div className="flex shrink-0 flex-nowrap items-center gap-2 self-end sm:self-auto">
           <Link
             href="/projects"
             className={cn(
@@ -68,18 +66,6 @@ export function DashboardHero({
             >
               <Plus className="mr-2 h-4 w-4" />
               새 프로젝트
-            </Link>
-          ) : null}
-          {showAdminLink ? (
-            <Link
-              href="/admin/users"
-              className={cn(
-                buttonVariants({ variant: "outline", size: "sm" }),
-                "border-white/25 bg-transparent text-white hover:bg-white/10",
-              )}
-            >
-              <Settings className="mr-2 h-4 w-4" />
-              사용자 관리
             </Link>
           ) : null}
         </div>

@@ -46,6 +46,28 @@ export function formatSupabaseNetworkError(message: string): string {
     );
   }
   if (
+    normalized.includes("it_user_schedule_colors") &&
+    (normalized.includes("schema cache") ||
+      normalized.includes("relation") ||
+      normalized.includes("does not exist"))
+  ) {
+    return (
+      "팀원 일정 색상 테이블이 없습니다. Supabase SQL Editor에서 " +
+      "supabase/migrations/021_it_user_schedule_colors.sql 파일 내용을 실행해 주세요."
+    );
+  }
+  if (
+    normalized.includes("it_user_schedule_entries") &&
+    (normalized.includes("schema cache") ||
+      normalized.includes("relation") ||
+      normalized.includes("does not exist"))
+  ) {
+    return (
+      "외근·휴가 일정 테이블이 없습니다. Supabase SQL Editor에서 " +
+      "supabase/migrations/020_it_user_schedule_entries.sql 파일 내용을 실행해 주세요."
+    );
+  }
+  if (
     normalized.includes("parent_id") &&
     normalized.includes("it_weekly_work_comments") &&
     (normalized.includes("schema cache") ||
@@ -69,6 +91,7 @@ export function formatSupabaseNetworkError(message: string): string {
     );
   }
   if (
+    normalized.includes("daily_entries") &&
     (normalized.includes("schema cache") ||
       normalized.includes("column") ||
       normalized.includes("does not exist"))

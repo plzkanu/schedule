@@ -1,5 +1,6 @@
 import type { Review } from "@/lib/review-types";
 import { ReviewCard } from "@/components/review-card";
+import { resolveUserDisplayLabel } from "@/lib/user-display";
 
 interface ReviewListViewProps {
   items: Review[];
@@ -26,16 +27,8 @@ export function ReviewListView({ items, userNames }: ReviewListViewProps) {
         <ReviewCard
           key={item.id}
           item={item}
-          reviewerName={
-            item.reviewer_id
-              ? (userNames[item.reviewer_id] ?? item.reviewer_id)
-              : "미지정"
-          }
-          requesterName={
-            item.requester_id
-              ? (userNames[item.requester_id] ?? item.requester_id)
-              : "미지정"
-          }
+          reviewerName={resolveUserDisplayLabel(userNames, item.reviewer_id, "미지정")}
+          requesterName={resolveUserDisplayLabel(userNames, item.requester_id, "미지정")}
         />
       ))}
     </div>

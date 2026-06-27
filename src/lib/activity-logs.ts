@@ -44,27 +44,45 @@ export async function logProjectActivity(params: {
 export async function listRecentActivityLogs(
   limit = 5,
 ): Promise<{ data: ActivityLog[]; error: string | null }> {
+  return listActivityLogsPaginated(1, limit).then(({ data, error }) => ({
+    data,
+    error,
+  }));
+}
+
+export async function listActivityLogsPaginated(
+  page = 1,
+  pageSize = 20,
+): Promise<{ data: ActivityLog[]; total: number; error: string | null }> {
   if (!isSupabaseConfigured()) {
-    return { data: [], error: null };
+    return { data: [], total: 0, error: null };
   }
+
+  const safePage = Math.max(1, page);
+  const from = (safePage - 1) * pageSize;
+  const to = from + pageSize - 1;
 
   try {
     const supabase = createServerClient();
-    const { data, error } = await supabase
+    const { data, error, count } = await supabase
       .from("it_activity_logs")
-      .select("*")
+      .select("*", { count: "exact" })
       .order("created_at", { ascending: false })
-      .limit(limit);
+      .range(from, to);
 
     if (error) {
-      return { data: [], error: formatSupabaseNetworkError(error.message) };
+      return { data: [], total: 0, error: formatSupabaseNetworkError(error.message) };
     }
 
-    return { data: (data ?? []) as ActivityLog[], error: null };
+    return {
+      data: (data ?? []) as ActivityLog[],
+      total: count ?? 0,
+      error: null,
+    };
   } catch (err) {
     const message =
       err instanceof Error ? err.message : "활동 이력 조회에 실패했습니다.";
-    return { data: [], error: formatSupabaseNetworkError(message) };
+    return { data: [], total: 0, error: formatSupabaseNetworkError(message) };
   }
 }
 

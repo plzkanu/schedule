@@ -129,7 +129,7 @@ export function ProjectGantt({
           status={statusByTaskId[task.id]}
           assigneeName={
             source?.assignee_id
-              ? assigneeNames[source.assignee_id]
+              ? (assigneeNames[source.assignee_id] ?? "담당자 미지정")
               : undefined
           }
           notes={source?.notes}

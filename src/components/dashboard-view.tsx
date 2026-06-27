@@ -6,7 +6,9 @@ import { Cpu, FolderKanban } from "lucide-react";
 import type { ActivityLog } from "@/lib/activity-logs";
 import type { DashboardData } from "@/lib/dashboard";
 import type { TechDashboardData } from "@/lib/tech-dashboard";
+import type { UserPublic } from "@/lib/types";
 import { DashboardApproachingList } from "@/components/dashboard-approaching-list";
+import { DashboardScheduleColumn } from "@/components/dashboard-team-schedule";
 import { DashboardCharts } from "@/components/dashboard-charts";
 import { DashboardHero } from "@/components/dashboard-hero";
 import { DashboardKpiCards } from "@/components/dashboard-kpi-cards";
@@ -22,13 +24,15 @@ interface DashboardViewProps {
   defaultTab: DashboardTab;
   userName: string;
   canWrite: boolean;
-  showAdminLink: boolean;
+  currentUserId: string;
+  assignees: UserPublic[];
   projectData: DashboardData;
   techData: TechDashboardData;
   ownerNames: Record<string, string>;
   userNames: Record<string, string>;
   projectNames: Record<string, string>;
   logs: ActivityLog[];
+  activityTotal: number;
   projectsError: string | null;
   logsError: string | null;
   techError: string | null;
@@ -114,16 +118,6 @@ export function DashboardView(props: DashboardViewProps) {
 
       {tab === "projects" ? (
         <>
-          <DashboardHero
-            userName={props.userName}
-            totalProjects={props.projectData.totalProjects}
-            inProgressProjects={props.projectData.inProgressProjects}
-            delayedProjects={props.projectData.delayedProjects}
-            completionRate={props.projectData.completionRate}
-            canWrite={props.canWrite}
-            showAdminLink={props.showAdminLink}
-          />
-
           {props.projectsError ? (
             <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">
               {props.projectsError}
@@ -136,12 +130,33 @@ export function DashboardView(props: DashboardViewProps) {
             </p>
           ) : null}
 
-          <DashboardKpiCards data={props.projectData} />
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,13fr)_minmax(0,7fr)] lg:items-stretch">
+            <div className="flex min-w-0 flex-col gap-6 lg:h-full">
+              <DashboardHero
+                userName={props.userName}
+                totalProjects={props.projectData.totalProjects}
+                inProgressProjects={props.projectData.inProgressProjects}
+                delayedProjects={props.projectData.delayedProjects}
+                completionRate={props.projectData.completionRate}
+                canWrite={props.canWrite}
+              />
 
-          <DashboardStatusOverview
-            statusSummary={props.projectData.statusSummary}
-            totalProjects={props.projectData.totalProjects}
-          />
+              <DashboardKpiCards data={props.projectData} />
+
+              <div className="mt-auto">
+                <DashboardStatusOverview
+                  statusSummary={props.projectData.statusSummary}
+                  totalProjects={props.projectData.totalProjects}
+                />
+              </div>
+            </div>
+
+            <DashboardScheduleColumn
+              assignees={props.assignees}
+              currentUserId={props.currentUserId}
+              canWrite={props.canWrite}
+            />
+          </div>
 
           <DashboardCharts
             statusDistribution={props.projectData.statusDistribution}
@@ -159,6 +174,7 @@ export function DashboardView(props: DashboardViewProps) {
               logs={props.logs}
               userNames={props.userNames}
               projectNames={props.projectNames}
+              totalCount={props.activityTotal}
             />
           </div>
         </>

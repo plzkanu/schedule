@@ -7,6 +7,7 @@ import { getProject } from "@/lib/projects";
 import { getReview } from "@/lib/reviews";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { getAllUsers } from "@/lib/users-store";
+import { buildUserDisplayMap, resolveUserDisplayLabel } from "@/lib/user-display";
 
 interface ReviewDetailPageProps {
   params: { id: string };
@@ -37,7 +38,7 @@ export default async function ReviewDetailPage({ params }: ReviewDetailPageProps
   if (!item) notFound();
 
   const users = await getAllUsers();
-  const userNames = Object.fromEntries(users.map((user) => [user.id, user.name]));
+  const userNames = buildUserDisplayMap(users);
 
   let projectName: string | undefined;
   if (item.project_id) {
@@ -49,12 +50,8 @@ export default async function ReviewDetailPage({ params }: ReviewDetailPageProps
     <AppShell session={session}>
       <ReviewDetailView
         item={item}
-        reviewerName={
-          item.reviewer_id ? (userNames[item.reviewer_id] ?? item.reviewer_id) : "미지정"
-        }
-        requesterName={
-          item.requester_id ? (userNames[item.requester_id] ?? item.requester_id) : "미지정"
-        }
+        reviewerName={resolveUserDisplayLabel(userNames, item.reviewer_id, "미지정")}
+        requesterName={resolveUserDisplayLabel(userNames, item.requester_id, "미지정")}
         projectName={projectName}
         canWrite={canWrite(session)}
       />

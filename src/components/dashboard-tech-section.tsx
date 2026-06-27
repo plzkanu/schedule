@@ -29,6 +29,7 @@ import {
   CHART_MATURITY_COLORS,
 } from "@/lib/tech-capability-types";
 import type { TechDashboardData } from "@/lib/tech-dashboard";
+import { resolveUserDisplayLabel } from "@/lib/user-display";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 
@@ -266,9 +267,7 @@ export function DashboardTechSection({
                         </div>
                         <p className="mt-1.5 text-xs text-slate-500">
                           목표 {formatDateLabel(item.target_date)} ·{" "}
-                          {item.owner_id
-                            ? (ownerNames[item.owner_id] ?? item.owner_id)
-                            : "담당자 미지정"}
+                          {resolveUserDisplayLabel(ownerNames, item.owner_id, "담당자 미지정")}
                         </p>
                         <ProgressBar
                           value={item.progress}

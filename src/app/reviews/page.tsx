@@ -22,6 +22,7 @@ import { REVIEW_STATUSES } from "@/lib/review-types";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { getAllUsers } from "@/lib/users-store";
 import { toPublicUser } from "@/lib/types";
+import { buildUserDisplayMap } from "@/lib/user-display";
 
 interface ReviewsPageProps {
   searchParams: Record<string, string | string[] | undefined>;
@@ -63,7 +64,7 @@ export default async function ReviewsPage({ searchParams }: ReviewsPageProps) {
   const assignees = users
     .filter((user) => user.role === "admin" || user.role === "member")
     .map(toPublicUser);
-  const userNames = Object.fromEntries(users.map((user) => [user.id, user.name]));
+  const userNames = buildUserDisplayMap(users);
 
   const filters = parsePageFilters(searchParams);
   const emptyResult = { data: [] as Review[], error: null };

@@ -22,6 +22,7 @@ import { TECH_MATURITIES } from "@/lib/tech-capability-types";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { getAllUsers } from "@/lib/users-store";
 import { toPublicUser } from "@/lib/types";
+import { buildUserDisplayMap } from "@/lib/user-display";
 
 interface TechCapabilitiesPageProps {
   searchParams: Record<string, string | string[] | undefined>;
@@ -94,7 +95,7 @@ export default async function TechCapabilitiesPage({
   const assignees = users
     .filter((user) => user.role === "admin" || user.role === "member")
     .map(toPublicUser);
-  const ownerNames = Object.fromEntries(users.map((user) => [user.id, user.name]));
+  const ownerNames = buildUserDisplayMap(users);
 
   const filters = parsePageFilters(searchParams);
 

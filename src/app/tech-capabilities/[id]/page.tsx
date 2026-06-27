@@ -6,6 +6,7 @@ import { canWrite, getSessionUser } from "@/lib/auth";
 import { getTechCapability } from "@/lib/tech-capabilities";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { getAllUsers } from "@/lib/users-store";
+import { buildUserDisplayMap, resolveUserDisplayLabel } from "@/lib/user-display";
 
 interface TechCapabilityDetailPageProps {
   params: { id: string };
@@ -46,10 +47,8 @@ export default async function TechCapabilityDetailPage({
   }
 
   const users = await getAllUsers();
-  const userNames = Object.fromEntries(users.map((user) => [user.id, user.name]));
-  const ownerName = item.owner_id
-    ? (userNames[item.owner_id] ?? item.owner_id)
-    : "미지정";
+  const userNames = buildUserDisplayMap(users);
+  const ownerName = resolveUserDisplayLabel(userNames, item.owner_id, "미지정");
 
   return (
     <AppShell session={session}>
