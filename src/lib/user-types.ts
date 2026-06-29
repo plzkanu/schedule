@@ -24,6 +24,7 @@ export interface ItUserRow {
   password_hash: string;
   role: UserRole;
   department: string;
+  avatar_url?: string | null;
   created_at?: string;
   updated_at?: string;
 }

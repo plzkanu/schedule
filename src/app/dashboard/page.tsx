@@ -5,8 +5,9 @@ import { DashboardView, type DashboardTab } from "@/components/dashboard-view";
 import { SupabaseConfigAlert } from "@/components/supabase-config-alert";
 import { listActivityLogsPaginated } from "@/lib/activity-logs";
 import { canWrite, getSessionUser } from "@/lib/auth";
-import { buildDashboardData } from "@/lib/dashboard";
+import { buildDashboardData, buildWeeklyTasksByProject } from "@/lib/dashboard";
 import { listProjects } from "@/lib/projects";
+import { listTasksEndingThisWeek } from "@/lib/tasks";
 import { buildTechDashboardData } from "@/lib/tech-dashboard";
 import { listTechCapabilities } from "@/lib/tech-capabilities";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
@@ -44,10 +45,12 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
 
   const [
     { data: projects, error: projectsError },
+    { data: weeklyTasks, error: tasksError },
     { data: logs, total: activityTotal, error: logsError },
     { data: techItems, error: techError },
   ] = await Promise.all([
     listProjects(),
+    listTasksEndingThisWeek(),
     listActivityLogsPaginated(1, 5),
     listTechCapabilities(),
   ]);
@@ -63,6 +66,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   );
 
   const dashboard = buildDashboardData(projects, ownerNames);
+  const weeklyTasksByProject = buildWeeklyTasksByProject(projects, weeklyTasks);
   const techDashboard = buildTechDashboardData(techItems);
   const defaultTab = parseTab(getParam(searchParams.tab));
 
@@ -76,6 +80,8 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           currentUserId={session.id}
           assignees={assignees}
           projectData={dashboard}
+          weeklyTasksByProject={weeklyTasksByProject}
+          tasksError={tasksError}
           techData={techDashboard}
           ownerNames={ownerNames}
           userNames={userNames}

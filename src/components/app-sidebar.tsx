@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   ClipboardList,
   CalendarDays,
@@ -12,6 +12,7 @@ import {
   Users,
 } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
+import { UserAvatar } from "@/components/user-avatar";
 import { WeeklyWorkNotificationBadge } from "@/components/weekly-work-notification-badge";
 import { ROLE_LABELS } from "@/lib/role-labels";
 import { canManageUsers } from "@/lib/auth-permissions";
@@ -37,6 +38,7 @@ interface AppSidebarProps {
 
 export function AppSidebar({ session }: AppSidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
 
   async function handleLogout() {
     await fetch("/api/auth/logout", { method: "POST" });
@@ -65,9 +67,15 @@ export function AppSidebar({ session }: AppSidebarProps) {
       <div className="border-b border-white/10 px-4 py-4">
         <div className="rounded-xl bg-white/10 px-3 py-3 ring-1 ring-white/10">
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-cyan text-sm font-semibold text-white">
-              {session.name.charAt(0)}
-            </div>
+            <UserAvatar
+              userId={session.id}
+              name={session.name}
+              avatarUrl={session.avatarUrl}
+              size="sm"
+              fallbackClassName="bg-brand-cyan text-white ring-white/20"
+              editable
+              onAvatarChange={() => router.refresh()}
+            />
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
                 <p className="truncate text-sm font-semibold">{session.name}</p>

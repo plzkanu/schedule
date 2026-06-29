@@ -7,9 +7,16 @@ import {
 } from "date-fns";
 import type { Project, ProjectStatus } from "./project-types";
 import { PROJECT_STATUSES, STATUS_HEX_COLORS } from "./project-types";
+import type { ItTask } from "./task-types";
 
-export interface ApproachingProject extends Project {
+export interface WeeklyTaskItem extends ItTask {
   dDay: number;
+}
+
+export interface ProjectWeeklyTasks {
+  projectId: string;
+  projectName: string;
+  tasks: WeeklyTaskItem[];
 }
 
 export interface DashboardData {
@@ -24,7 +31,6 @@ export interface DashboardData {
   statusSummary: { status: ProjectStatus; count: number }[];
   ownerDistribution: { name: string; count: number }[];
   departmentDistribution: { department: string; count: number }[];
-  approachingProjects: ApproachingProject[];
 }
 
 export function calculateProjectDDay(
@@ -140,20 +146,6 @@ export function buildDashboardData(
     .map(([department, count]) => ({ department, count }))
     .sort((a, b) => b.count - a.count);
 
-  const approachingProjects = projects
-    .filter((project) => {
-      if (project.status === "완료") {
-        return false;
-      }
-      const dDay = calculateProjectDDay(project.end_date, today);
-      return project.status === "지연" || dDay <= 7;
-    })
-    .map((project) => ({
-      ...project,
-      dDay: calculateProjectDDay(project.end_date, today),
-    }))
-    .sort((a, b) => a.dDay - b.dDay);
-
   return {
     totalProjects,
     inProgressProjects,
@@ -166,6 +158,39 @@ export function buildDashboardData(
     statusSummary,
     ownerDistribution,
     departmentDistribution,
-    approachingProjects,
   };
+}
+
+export function buildWeeklyTasksByProject(
+  projects: Project[],
+  tasks: ItTask[],
+  today = startOfDay(new Date()),
+): ProjectWeeklyTasks[] {
+  const projectNames = Object.fromEntries(
+    projects.map((project) => [project.id, project.name]),
+  );
+  const grouped = new Map<string, WeeklyTaskItem[]>();
+
+  for (const task of tasks) {
+    const items = grouped.get(task.project_id) ?? [];
+    items.push({
+      ...task,
+      dDay: calculateProjectDDay(task.end_date, today),
+    });
+    grouped.set(task.project_id, items);
+  }
+
+  return Array.from(grouped.entries())
+    .map(([projectId, projectTasks]) => ({
+      projectId,
+      projectName: projectNames[projectId] ?? "알 수 없는 프로젝트",
+      tasks: projectTasks.sort((a, b) => {
+        const byDate = a.end_date.localeCompare(b.end_date);
+        if (byDate !== 0) {
+          return byDate;
+        }
+        return a.sort_order - b.sort_order;
+      }),
+    }))
+    .sort((a, b) => a.projectName.localeCompare(b.projectName, "ko"));
 }

@@ -26,6 +26,7 @@ function mapUser(row: ItUserRow): User {
     passwordHash: row.password_hash,
     role: row.role,
     department: row.department ?? "",
+    avatarUrl: row.avatar_url ?? null,
   };
 }
 

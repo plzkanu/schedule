@@ -15,7 +15,7 @@ import type {
   TaskInput,
   TaskWithDependencies,
 } from "@/lib/task-types";
-import { format } from "date-fns";
+import { format, startOfDay, startOfWeek, endOfWeek } from "date-fns";
 
 interface FetchResult<T> {
   data: T;
@@ -114,6 +114,43 @@ export async function listProjectTasks(
       data: sortTasksHierarchically(
         attachDependencies(taskList, dependencies ?? []),
       ),
+      error: null,
+    };
+  } catch (err) {
+    const message =
+      err instanceof Error ? err.message : "태스크 목록 조회에 실패했습니다.";
+    return { data: [], error: formatSupabaseNetworkError(message) };
+  }
+}
+
+const WEEK_STARTS_ON = 0 as const;
+
+export async function listTasksEndingThisWeek(): Promise<FetchResult<ItTask[]>> {
+  if (!isSupabaseConfigured()) {
+    return { data: [], error: null };
+  }
+
+  try {
+    const today = startOfDay(new Date());
+    const weekStart = startOfWeek(today, { weekStartsOn: WEEK_STARTS_ON });
+    const weekEnd = endOfWeek(today, { weekStartsOn: WEEK_STARTS_ON });
+    const supabase = createServerClient();
+    const { data, error } = await supabase
+      .from("it_tasks")
+      .select("*")
+      .gte("end_date", format(weekStart, "yyyy-MM-dd"))
+      .lte("end_date", format(weekEnd, "yyyy-MM-dd"))
+      .neq("status", "완료")
+      .eq("is_group", false)
+      .order("end_date", { ascending: true })
+      .order("sort_order", { ascending: true });
+
+    if (error) {
+      return { data: [], error: formatSupabaseNetworkError(error.message) };
+    }
+
+    return {
+      data: normalizeTaskRecords((data ?? []) as ItTask[]),
       error: null,
     };
   } catch (err) {

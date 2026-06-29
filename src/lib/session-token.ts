@@ -94,6 +94,7 @@ export async function parseSessionToken(
     return {
       ...parsed,
       department: parsed.department ?? "",
+      avatarUrl: parsed.avatarUrl ?? null,
     };
   } catch {
     return null;

@@ -1,13 +1,13 @@
 "use client";
 
-import Link from "next/link";
 import { useMemo, useState } from "react";
-import { format } from "date-fns";
-import { LayoutGrid, List, Search } from "lucide-react";
-import { ProjectCard } from "@/components/project-card";
-import { PriorityBadge } from "@/components/priority-badge";
-import { ProgressBar } from "@/components/progress-bar";
-import { ProjectStatusBadge } from "@/components/project-status-badge";
+import { useRouter } from "next/navigation";
+import { LayoutGrid, List, Search, Users } from "lucide-react";
+import {
+  ProjectOwnerSection,
+  type OwnerProjectGroup,
+} from "@/components/project-owner-section";
+import { ProjectListTable } from "@/components/project-list-table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -17,16 +17,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import type { Project } from "@/lib/project-types";
 import { sortProjectsForList } from "@/lib/project-sort";
+import { canManageUsers } from "@/lib/auth-permissions";
+import type { SessionUser } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 type ViewMode = "table" | "grid";
@@ -35,16 +29,88 @@ type SortKey = "updated" | "name" | "progress" | "end_date";
 interface ProjectListViewProps {
   projects: Project[];
   ownerMap: Record<string, string>;
+  avatarMap: Record<string, string>;
+  session: SessionUser;
 }
 
-function formatDateLabel(value: string) {
-  return format(new Date(`${value}T00:00:00`), "yyyy-MM-dd");
+function canEditOwnerAvatar(session: SessionUser, ownerId: string | null) {
+  if (!ownerId) {
+    return false;
+  }
+  return session.id === ownerId || canManageUsers(session);
 }
 
-export function ProjectListView({ projects, ownerMap }: ProjectListViewProps) {
+function sortProjectList(projects: Project[], sort: SortKey): Project[] {
+  return sortProjectsForList(projects, (a, b) => {
+    switch (sort) {
+      case "name":
+        return a.name.localeCompare(b.name, "ko");
+      case "progress":
+        return b.progress - a.progress;
+      case "end_date":
+        return a.end_date.localeCompare(b.end_date);
+      default:
+        return b.updated_at.localeCompare(a.updated_at);
+    }
+  });
+}
+
+function groupProjectsByOwner(
+  projects: Project[],
+  ownerMap: Record<string, string>,
+  sort: SortKey,
+): OwnerProjectGroup[] {
+  const grouped = new Map<string | null, Project[]>();
+
+  for (const project of projects) {
+    const ownerId = project.owner_id ?? null;
+    const list = grouped.get(ownerId) ?? [];
+    list.push(project);
+    grouped.set(ownerId, list);
+  }
+
+  return Array.from(grouped.entries())
+    .map(([ownerId, ownerProjects]) => ({
+      ownerId,
+      ownerLabel: ownerId
+        ? (ownerMap[ownerId] ?? "담당자 미지정")
+        : "담당자 미지정",
+      projects: sortProjectList(ownerProjects, sort),
+    }))
+    .sort((a, b) => a.ownerLabel.localeCompare(b.ownerLabel, "ko"));
+}
+
+function scrollToOwnerSection(ownerId: string | null) {
+  const element = document.getElementById(
+    `owner-${ownerId ?? "unassigned"}`,
+  );
+  element?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+export function ProjectListView({
+  projects,
+  ownerMap,
+  avatarMap: initialAvatarMap,
+  session,
+}: ProjectListViewProps) {
+  const router = useRouter();
   const [view, setView] = useState<ViewMode>("table");
   const [sort, setSort] = useState<SortKey>("updated");
   const [localSearch, setLocalSearch] = useState("");
+  const [avatarMap, setAvatarMap] = useState(initialAvatarMap);
+
+  function handleAvatarChange(userId: string, avatarUrl: string | null) {
+    setAvatarMap((prev) => {
+      const next = { ...prev };
+      if (avatarUrl) {
+        next[userId] = avatarUrl;
+      } else {
+        delete next[userId];
+      }
+      return next;
+    });
+    router.refresh();
+  }
 
   const filtered = useMemo(() => {
     const q = localSearch.trim().toLowerCase();
@@ -54,25 +120,21 @@ export function ProjectListView({ projects, ownerMap }: ProjectListViewProps) {
         (p) =>
           p.name.toLowerCase().includes(q) ||
           (p.department ?? "").toLowerCase().includes(q) ||
-          (p.owner_id ? (ownerMap[p.owner_id] ?? "").toLowerCase().includes(q) : false),
+          (p.owner_id
+            ? (ownerMap[p.owner_id] ?? "").toLowerCase().includes(q)
+            : false),
       );
     }
-    return sortProjectsForList(list, (a, b) => {
-      switch (sort) {
-        case "name":
-          return a.name.localeCompare(b.name, "ko");
-        case "progress":
-          return b.progress - a.progress;
-        case "end_date":
-          return a.end_date.localeCompare(b.end_date);
-        default:
-          return b.updated_at.localeCompare(a.updated_at);
-      }
-    });
-  }, [projects, localSearch, sort, ownerMap]);
+    return list;
+  }, [projects, localSearch, ownerMap]);
+
+  const groupedProjects = useMemo(
+    () => groupProjectsByOwner(filtered, ownerMap, sort),
+    [filtered, ownerMap, sort],
+  );
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="relative max-w-md flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
@@ -104,35 +166,62 @@ export function ProjectListView({ projects, ownerMap }: ProjectListViewProps) {
               size="sm"
               variant={view === "table" ? "default" : "ghost"}
               className={cn(
-                "h-8 px-2",
+                "h-8 gap-1.5 px-2.5",
                 view === "table" && "bg-brand-navy hover:bg-brand-navy-dark",
               )}
               onClick={() => setView("table")}
             >
               <List className="h-4 w-4" />
+              <span className="hidden sm:inline">목록</span>
             </Button>
             <Button
               type="button"
               size="sm"
               variant={view === "grid" ? "default" : "ghost"}
               className={cn(
-                "h-8 px-2",
+                "h-8 gap-1.5 px-2.5",
                 view === "grid" && "bg-brand-navy hover:bg-brand-navy-dark",
               )}
               onClick={() => setView("grid")}
             >
               <LayoutGrid className="h-4 w-4" />
+              <span className="hidden sm:inline">카드</span>
             </Button>
           </div>
         </div>
       </div>
 
-      <div className="flex items-center justify-between text-sm text-slate-500">
-        <span>
-          {filtered.length}건
-          {localSearch ? ` (전체 ${projects.length}건 중)` : ""}
-        </span>
-      </div>
+      {filtered.length > 0 ? (
+        <div className="surface-card flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-2 text-sm text-slate-600">
+            <Users className="h-4 w-4 text-brand-navy" />
+            <span>
+              담당자 <strong className="text-slate-900">{groupedProjects.length}명</strong>
+              {" · "}
+              프로젝트 <strong className="text-slate-900">{filtered.length}건</strong>
+              {localSearch ? (
+                <span className="text-slate-400"> (전체 {projects.length}건)</span>
+              ) : null}
+            </span>
+          </div>
+
+          {groupedProjects.length > 1 ? (
+            <div className="flex flex-wrap gap-1.5">
+              {groupedProjects.map((group) => (
+                <button
+                  key={group.ownerId ?? "unassigned"}
+                  type="button"
+                  onClick={() => scrollToOwnerSection(group.ownerId)}
+                  className="rounded-full bg-slate-50 px-2.5 py-1 text-xs font-medium text-slate-600 ring-1 ring-slate-200 transition hover:bg-brand-navy hover:text-white hover:ring-brand-navy"
+                >
+                  {group.ownerLabel.split("(")[0]?.trim() ?? group.ownerLabel}
+                  <span className="ml-1 opacity-70">{group.projects.length}</span>
+                </button>
+              ))}
+            </div>
+          ) : null}
+        </div>
+      ) : null}
 
       {filtered.length === 0 ? (
         <div className="surface-card py-16 text-center">
@@ -146,74 +235,29 @@ export function ProjectListView({ projects, ownerMap }: ProjectListViewProps) {
           </p>
         </div>
       ) : view === "grid" ? (
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {filtered.map((project) => (
-            <ProjectCard
-              key={project.id}
-              project={project}
-              ownerName={
-                project.owner_id
-                  ? (ownerMap[project.owner_id] ?? "담당자 미지정")
-                  : "미지정"
+        <div className="space-y-6">
+          {groupedProjects.map((group, index) => (
+            <ProjectOwnerSection
+              key={group.ownerId ?? "unassigned"}
+              group={group}
+              index={index}
+              avatarUrl={group.ownerId ? avatarMap[group.ownerId] : null}
+              canEditAvatar={canEditOwnerAvatar(session, group.ownerId)}
+              onAvatarChange={
+                group.ownerId
+                  ? (avatarUrl) => handleAvatarChange(group.ownerId as string, avatarUrl)
+                  : undefined
               }
             />
           ))}
         </div>
       ) : (
-        <div className="overflow-x-auto surface-card">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-slate-50/80 hover:bg-slate-50/80">
-                <TableHead>프로젝트</TableHead>
-                <TableHead>상태</TableHead>
-                <TableHead>우선순위</TableHead>
-                <TableHead>기간</TableHead>
-                <TableHead>진행률</TableHead>
-                <TableHead>담당자</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filtered.map((project) => (
-                <TableRow
-                  key={project.id}
-                  className="transition hover:bg-slate-50/80"
-                >
-                  <TableCell className="max-w-[240px]">
-                    <Link
-                      href={`/projects/${project.id}`}
-                      className="font-medium text-brand-navy hover:text-brand-cyan hover:underline"
-                    >
-                      {project.name}
-                    </Link>
-                    {project.department ? (
-                      <p className="mt-0.5 truncate text-xs text-slate-400">
-                        {project.department}
-                      </p>
-                    ) : null}
-                  </TableCell>
-                  <TableCell>
-                    <ProjectStatusBadge status={project.status} />
-                  </TableCell>
-                  <TableCell>
-                    <PriorityBadge priority={project.priority} />
-                  </TableCell>
-                  <TableCell className="whitespace-nowrap text-sm text-slate-600">
-                    {formatDateLabel(project.start_date)} ~{" "}
-                    {formatDateLabel(project.end_date)}
-                  </TableCell>
-                  <TableCell className="min-w-[130px]">
-                    <ProgressBar value={project.progress} showLabel />
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    {project.owner_id
-                      ? (ownerMap[project.owner_id] ?? "담당자 미지정")
-                      : "-"}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+        <ProjectListTable
+          groups={groupedProjects}
+          avatarMap={avatarMap}
+          session={session}
+          onAvatarChange={handleAvatarChange}
+        />
       )}
     </div>
   );

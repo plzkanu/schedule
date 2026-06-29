@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 interface ProjectCardProps {
   project: Project;
   ownerName: string;
+  showOwner?: boolean;
 }
 
 function formatDateLabel(value: string) {
@@ -27,7 +28,11 @@ const DDAY_CLASS = {
   default: "text-slate-600 bg-slate-100",
 } as const;
 
-export function ProjectCard({ project, ownerName }: ProjectCardProps) {
+export function ProjectCard({
+  project,
+  ownerName,
+  showOwner = true,
+}: ProjectCardProps) {
   const dDay = calculateProjectDDay(project.end_date);
   const dDayVariant = getDDayBadgeVariant(dDay, project.status);
 
@@ -77,10 +82,12 @@ export function ProjectCard({ project, ownerName }: ProjectCardProps) {
         </div>
       </div>
 
-      <div className="mt-auto border-t border-slate-100 pt-4 text-xs text-slate-500">
-        <span className="font-medium text-slate-700">{ownerName}</span>
-        {project.department ? ` · ${project.department}` : null}
-      </div>
+      {showOwner ? (
+        <div className="mt-auto border-t border-slate-100 pt-4 text-xs text-slate-500">
+          <span className="font-medium text-slate-700">{ownerName}</span>
+          {project.department ? ` · ${project.department}` : null}
+        </div>
+      ) : null}
     </Link>
   );
 }

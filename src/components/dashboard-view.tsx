@@ -4,10 +4,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useTransition } from "react";
 import { Cpu, FolderKanban } from "lucide-react";
 import type { ActivityLog } from "@/lib/activity-logs";
-import type { DashboardData } from "@/lib/dashboard";
+import type { DashboardData, ProjectWeeklyTasks } from "@/lib/dashboard";
 import type { TechDashboardData } from "@/lib/tech-dashboard";
 import type { UserPublic } from "@/lib/types";
-import { DashboardApproachingList } from "@/components/dashboard-approaching-list";
+import { DashboardWeeklyTasks } from "@/components/dashboard-weekly-tasks";
 import { DashboardScheduleColumn } from "@/components/dashboard-team-schedule";
 import { DashboardCharts } from "@/components/dashboard-charts";
 import { DashboardHero } from "@/components/dashboard-hero";
@@ -27,6 +27,8 @@ interface DashboardViewProps {
   currentUserId: string;
   assignees: UserPublic[];
   projectData: DashboardData;
+  weeklyTasksByProject: ProjectWeeklyTasks[];
+  tasksError: string | null;
   techData: TechDashboardData;
   ownerNames: Record<string, string>;
   userNames: Record<string, string>;
@@ -130,6 +132,12 @@ export function DashboardView(props: DashboardViewProps) {
             </p>
           ) : null}
 
+          {props.tasksError ? (
+            <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">
+              {props.tasksError}
+            </p>
+          ) : null}
+
           <div className="grid gap-6 lg:grid-cols-[minmax(0,13fr)_minmax(0,7fr)] lg:items-stretch">
             <div className="flex min-w-0 flex-col gap-6 lg:h-full">
               <DashboardHero
@@ -166,9 +174,9 @@ export function DashboardView(props: DashboardViewProps) {
           />
 
           <div className="grid gap-6 xl:grid-cols-2">
-            <DashboardApproachingList
-              projects={props.projectData.approachingProjects}
-              ownerNames={props.ownerNames}
+            <DashboardWeeklyTasks
+              groups={props.weeklyTasksByProject}
+              userNames={props.userNames}
             />
             <DashboardRecentActivity
               logs={props.logs}

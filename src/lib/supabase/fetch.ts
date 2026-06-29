@@ -46,6 +46,17 @@ export function formatSupabaseNetworkError(message: string): string {
     );
   }
   if (
+    normalized.includes("avatar_url") &&
+    (normalized.includes("schema cache") ||
+      normalized.includes("does not exist") ||
+      normalized.includes("column"))
+  ) {
+    return (
+      "사용자 프로필 이미지 컬럼이 없습니다. Supabase SQL Editor에서 " +
+      "supabase/migrations/022_it_users_avatar_url.sql 파일 내용을 실행해 주세요."
+    );
+  }
+  if (
     normalized.includes("it_user_schedule_colors") &&
     (normalized.includes("schema cache") ||
       normalized.includes("relation") ||

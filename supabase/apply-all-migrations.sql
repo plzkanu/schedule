@@ -348,4 +348,18 @@ CREATE TABLE IF NOT EXISTS it_user_schedule_colors (
 
 ALTER TABLE it_user_schedule_colors DISABLE ROW LEVEL SECURITY;
 
+-- 022 it_users avatar_url + storage bucket
+ALTER TABLE it_users
+  ADD COLUMN IF NOT EXISTS avatar_url text;
+
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES (
+  'user-avatars',
+  'user-avatars',
+  true,
+  524288,
+  ARRAY['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+)
+ON CONFLICT (id) DO NOTHING;
+
 NOTIFY pgrst, 'reload schema';

@@ -21,6 +21,7 @@ import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { getAllUsers } from "@/lib/users-store";
 import { toPublicUser } from "@/lib/types";
 import { buildUserDisplayMap } from "@/lib/user-display";
+import { buildUserAvatarMap } from "@/lib/user-avatars";
 
 interface ProjectsPageProps {
   searchParams: Record<string, string | string[] | undefined>;
@@ -92,6 +93,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
     .filter((user) => user.role === "admin" || user.role === "member")
     .map(toPublicUser);
   const ownerMap = buildUserDisplayMap(users);
+  const avatarMap = buildUserAvatarMap(users);
 
   const filters = parsePageFilters(searchParams);
 
@@ -148,6 +150,8 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
             <ProjectListView
               projects={projects}
               ownerMap={ownerMap}
+              avatarMap={avatarMap}
+              session={session}
             />
           </>
         )}
