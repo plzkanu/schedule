@@ -2,6 +2,19 @@ import type { SessionUser } from "./types";
 
 const SESSION_COOKIE = "it_schedule_session";
 
+/** Cookie payload — avatarUrl is excluded (loaded from DB; can exceed 4KB as base64). */
+type SessionTokenPayload = Omit<SessionUser, "avatarUrl">;
+
+function toSessionTokenPayload(user: SessionUser): SessionTokenPayload {
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    department: user.department ?? "",
+  };
+}
+
 function getAuthSecret() {
   return process.env.AUTH_SECRET ?? "dev-secret-change-in-production";
 }
@@ -71,7 +84,7 @@ async function verifySignature(payload: string, signature: string) {
 }
 
 export async function createSessionToken(user: SessionUser) {
-  const payload = encodeBase64Url(JSON.stringify(user));
+  const payload = encodeBase64Url(JSON.stringify(toSessionTokenPayload(user)));
   const signature = await signPayload(payload);
   return `${payload}.${signature}`;
 }
@@ -90,11 +103,17 @@ export async function parseSessionToken(
   }
 
   try {
-    const parsed = JSON.parse(decodeBase64Url(payload)) as SessionUser;
+    const parsed = JSON.parse(decodeBase64Url(payload)) as Partial<SessionUser>;
+    if (!parsed.id || !parsed.name || !parsed.email || !parsed.role) {
+      return null;
+    }
     return {
-      ...parsed,
+      id: parsed.id,
+      name: parsed.name,
+      email: parsed.email,
+      role: parsed.role,
       department: parsed.department ?? "",
-      avatarUrl: parsed.avatarUrl ?? null,
+      avatarUrl: null,
     };
   } catch {
     return null;
