@@ -3,6 +3,9 @@ entrypoint = "package.json"
 hidden = [".config", ".next", "node_modules"]
 modules = ["nodejs-22"]
 
+[env]
+PORT = "3001"
+
 [nix]
 channel = "stable-24_11"
 

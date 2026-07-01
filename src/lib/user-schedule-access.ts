@@ -21,8 +21,9 @@ export function scopeUserScheduleFilters(
 
 export function canViewUserScheduleEntry(
   session: SessionUser,
-  _entry: UserScheduleEntry,
+  entry: UserScheduleEntry,
 ): boolean {
+  void entry;
   return isItTeamMember(session);
 }
 
