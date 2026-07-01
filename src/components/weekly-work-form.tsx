@@ -215,11 +215,13 @@ export function WeeklyWorkForm({ mode, item }: WeeklyWorkFormProps) {
       ) : (
         <div className="space-y-2">
           <Label htmlFor="content">업무 개요</Label>
-          <Input
+          <Textarea
             id="content"
+            className="min-h-24"
             value={form.content ?? ""}
             onChange={(event) => updateField("content", event.target.value)}
             placeholder="예: PC 교체 지원, 회의실 AV 점검"
+            rows={4}
           />
           <p className="text-xs text-slate-500">
             잡무의 전체 개요를 간단히 입력합니다. 요일별 계획·실적은 아래에

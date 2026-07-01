@@ -90,13 +90,18 @@ export function ProjectIssueList({
                     {issue.title}
                   </h3>
                   {issue.description ? (
-                    <p className="mt-1 line-clamp-2 text-sm text-slate-600">
+                    <p className="mt-1 whitespace-pre-wrap text-sm leading-relaxed text-slate-600">
                       {issue.description}
                     </p>
                   ) : null}
                   {issue.resolution && issue.status === "해결" ? (
-                    <p className="mt-2 rounded-lg bg-emerald-50 px-3 py-2 text-xs text-emerald-800">
+                    <p className="mt-2 whitespace-pre-wrap rounded-lg bg-emerald-50 px-3 py-2 text-xs leading-relaxed text-emerald-800">
                       해결: {issue.resolution}
+                    </p>
+                  ) : null}
+                  {issue.notes ? (
+                    <p className="mt-2 whitespace-pre-wrap text-xs leading-relaxed text-slate-500">
+                      비고: {issue.notes}
                     </p>
                   ) : null}
                 </div>

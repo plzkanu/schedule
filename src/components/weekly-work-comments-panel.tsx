@@ -357,7 +357,7 @@ export function WeeklyWorkCommentsPanel({
             {formatWeekRangeLabel(item.week_start)}
           </span>
         </div>
-        <h2 className="mt-3 text-lg font-semibold text-slate-900">
+        <h2 className="mt-3 whitespace-pre-wrap text-lg font-semibold text-slate-900">
           {getWeeklyWorkSummary(item)}
         </h2>
         <p className="mt-1 text-sm text-slate-500">
@@ -380,13 +380,13 @@ export function WeeklyWorkCommentsPanel({
                   ) : null}
                 </div>
                 {day.plan.trim() ? (
-                  <p className="mt-1 leading-relaxed text-slate-600">
+                  <p className="mt-1 whitespace-pre-wrap leading-relaxed text-slate-600">
                     <span className="font-medium text-slate-500">계획</span>{" "}
                     {day.plan}
                   </p>
                 ) : null}
                 {day.actual.trim() ? (
-                  <p className="mt-1 leading-relaxed text-slate-600">
+                  <p className="mt-1 whitespace-pre-wrap leading-relaxed text-slate-600">
                     <span className="font-medium text-slate-500">실적</span>{" "}
                     {day.actual}
                   </p>

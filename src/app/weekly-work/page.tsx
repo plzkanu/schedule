@@ -82,7 +82,6 @@ export default async function WeeklyWorkPage({
   );
 
   const admin = isAdmin(session);
-  const showAuthor = session.role === "admin" || session.role === "viewer";
 
   return (
     <AppShell session={session}>
@@ -133,7 +132,6 @@ export default async function WeeklyWorkPage({
             <WeeklyWorkListView
               items={items}
               assignees={assignees}
-              showAuthor={showAuthor}
               canWrite={canWrite(session)}
               currentUserId={session.id}
               isAdmin={admin}
